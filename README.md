@@ -8,10 +8,10 @@ The goal of this project can be summed up to two points
 
 ## Progress
 ### Hello.py
-This is the default routing page for a Flask web application. So far only a proof of concept has been set up to establish how exactly web servers connect to database servers.
-There are two routes, home and paragrpah. Home is the default page, which will eventually become the query page. Right now the default index.html page is
-set up to take in two inputs and on submit, pass them along to the paragraph route. The paragraph page then queries on the server side data from the database and passes it along
-to the paragrpah.html page for display.
+This is the default routing page for a Flask web application. This page handles requesting data from the MySql Server, HTML routing requests, function logic, and displaying
+webpages. By default it presents the index.html page to the user. It also handles the routing and logic behind 3 major actions. Load-content which sends html snippits to the JS
+in index.html. Load-action which handles clicking one of the action buttons on a table. This will load the appropiate modal in response. Commit-data will handle taking in data
+from a modal form and committing it to the database.
 
 ## Templates
 This folder serves as the storage for all of html pages and snippits availble to Flask and Jinja. Each of these serve their own unqiue function with their
@@ -31,8 +31,7 @@ However, it is proving hard to accomplish as data types within a form are not un
 I will either complete this or move to an iterative solution instead.
 
 ## Moving Forward
-Now that I have a solid understanding of the back and forth between the web sever and the database server there is much to do.
-The first step will be to create an ER Diagram and fully create the database in a format that will hold all of the data values.
-The next step will then be to create a usable front end that allows for creation, deletion, and viewing of records
-After that, will the the step of writing the queries and functions required to have the web server and database communicate
-Once these are completed, refining the overall design and deploying the application for use will be visited.
+So far, there is a basic front end website and a complete database that can be populated at any time. The next steps are to create working action buttons that can
+create, search, update, and delete entries in a selected table. This is argueably the most monumental task. After it is done however, then steps can be taken to stylize the
+application page for aestetics as well as assess the need for any missing functions within the application. Possible additions would include generating an overview in 
+the dashboard page as well as adding an export to csv option for selected data.
