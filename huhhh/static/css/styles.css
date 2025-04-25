@@ -1,3 +1,117 @@
-p.textbox {
-    border: 2px solid black
+body {
+    margin: 0;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.root {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid:
+      "header" 1fr
+      "main"10fr;
+    gap: 8px;
+}
+  
+.header { 
+    grid-area: header; 
+    text-align: center;
+    margin: auto;
+    font-size: 48px;
+}
+
+.main { 
+  grid-area: main;
+  display: grid;
+  grid-template-columns: 1fr 4fr; 
+  /*gap: 8px;*/
+  min-height: 0;
+  border-top: 1px solid lightgray;
+}
+
+.navbar {
+    background: #f0f0f0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid lightgray;
+}
+
+.navbar a:hover {
+    background: #e0e0e0;
+}
+
+.navlink {
+    display: flex;
+    height: 60px;
+}
+
+.navitem {
+    text-align: center;
+    margin: auto;
+}
+
+.content {
+    background: #d0d0d0;
+    display: grid;
+    grid-template-rows: 1fr 8fr;
+    min-height: 0; 
+    gap: 16px;
+    padding: 16px 8px 0 16px;
+}
+
+.top-row {
+    background: #e0e0e0;
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+}
+
+.modal-header {
+
+}
+
+.modal-body {
+
+}
+
+.modal-footer {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+}
+
+.actionbox {
+    border-radius: 10px;
+    border: 1px solid gray;
+    height: 40px;
+    width: 100px;
+}
+
+.bottom-row {
+    background: #e0e0e0;
 }

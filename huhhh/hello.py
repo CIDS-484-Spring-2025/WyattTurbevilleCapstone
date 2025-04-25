@@ -6,7 +6,7 @@ db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': 'password',
-    'database': 'first_db',
+    'database': 'researchdb',
     'port': 3306
 }
 
@@ -14,28 +14,69 @@ db_config = {
 def home():
     return render_template('index.html')
 
-@app.route('/paragraph', methods = ['POST'])
-def send():
-    if request.method == 'POST':
-        #pull input values from index.html
-        searchMin = request.form['searchMin']
-        searchMax = request.form['searchMax']
+@app.route('/load-content/<page>')
+def load_content(page):
+    if page == "dashboard":
+        return render_template("dashboard.html")
+    elif page == "farm":
+        table_data = renderFarm()
+        return render_template('farm.html', table_data=table_data)
+    else:
+        return "<p>Page not found</p>", 404
+    
+def renderFarm():
 
-        #connect to the database
-        connection = mysql.connector.connect(**db_config)
-        cursor = connection.cursor()
+    connection = mysql.connector.connect(**db_config)
 
-        query = "SELECT textcol FROM sentances WHERE id BETWEEN %s AND %s"
-        cursor.execute(query, (searchMin, searchMax))
+    cursor = connection.cursor(dictionary=True) 
 
-        results = cursor.fetchall()
+    query = """
+        SELECT *
+        FROM farm;
+    """
 
-        cursor.close()
-        connection.close()
+    cursor.execute(query)
 
-        combined_string = '. '.join(row[0] for row in results)
+    table_data = cursor.execute(query)
 
-        return render_template('paragraph.html', combined_string=combined_string)
+    cursor.close()
+    connection.close()
+
+    return table_data
+
+@app.route('/load-action/<table>/<action>')
+def load_action(table, action):
+    if action == "search":
+        return render_template("modal.html")
+    if action == "add":
+        table_data = renderModal(table)
+        return render_template("modal.html", table_data=table_data)
+    if action == "update":
+        return render_template("modal.html")
+    if action == "delete":
+        return render_template("modal.html")
+
+def renderModal(table):
+
+    connection = mysql.connector.connect(**db_config)
+
+    cursor = connection.cursor(dictionary=True)
+
+    query = f"DESCRIBE {table}"
+
+    cursor.execute(query)
+
+    form_data = cursor.execute(query)
+
+    cursor.close()
+    connection.close()
+
+    return form_data
+
+@app.route('/commit-data', methods = ['POST'])
+def commitData():
+    
+    return
 
 if __name__ == '__main__':
     app.run()

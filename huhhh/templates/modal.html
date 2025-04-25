@@ -1,0 +1,56 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h2>Add Entry to Table</h2>
+    </div>
+    <div class="modal-body">
+        <form method="post">
+            {% for row in table_data %}
+                {% for field in row.field() %}
+                    {% if row.type.startswith('varchar')
+                        or row.type() == "int" 
+                        or row.type() == "tinyint" %}
+                        <label for="{{ row.type() }}">{{ row.type() }}</label>
+                        <input type="text" id="{{ row.type() }}" name="{{ row.type() }}">
+                    {% elif row.type() == "date" %}
+                        {# fix later, missing formatting #}
+                        <label for="{{ row.type() }}">{{ row.type() }}</label>
+                        <input type="text" id="{{ row.type() }}" name="{{ row.type() }}">
+                    {% elif row.type.startswith('enum') %}
+                        {% set options = row.type|regex_replace("^enum\\('|'\\)$", "")|split("','") %}
+
+                        <label for="{{ row.type() }}">Choose a type:</label>
+                        <select id="{{ row.type() }}" name="{{ row.type() }}">
+                            <option value="">-- Select --</option>
+                            {% for option in options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <p>Error trying to Match Type</p>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            <input type="button" id="custom-submit" value="Submit">
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button id="cancel">Cancel</button>
+        <button id="confirm">Confirm</button>
+    </div>
+</div>
+<script>
+    document.getElementById('custom-submit').addEventListener('click', async function(e) {
+      e.preventDefault(); // Prevent default form submission
+      
+      const form = document.getElementById('dynamic-form');
+      const formData = new FormData(form);
+
+      const response = await fetch('/your-endpoint', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+      });
+    });
+</script>

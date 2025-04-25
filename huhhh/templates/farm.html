@@ -1,0 +1,25 @@
+<div>
+    <h1>Farm Table</h1>
+    {% if table_data is defined and table_data %}
+    <table>
+        <thead>
+            <tr>
+                {% for key in table_data[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table_data %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value if value is not none else 'NULL' }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No data?</p>
+    {% endif %}
+</div>
