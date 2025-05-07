@@ -91,18 +91,16 @@ a {
     width: 60%;
 }
 
-.modal-header {
-
-}
-
-.modal-body {
-
-}
-
 .modal-footer {
     display: flex;
     gap: 16px;
     justify-content: flex-end;
+}
+
+.form-container {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .actionbox {
@@ -110,8 +108,49 @@ a {
     border: 1px solid gray;
     height: 40px;
     width: 100px;
+    display: none;
 }
 
 .bottom-row {
     background: #e0e0e0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+}
+
+tr {
+    display: flex;
+}
+
+th:not(.actioncol), td:not(.actioncol) {
+    flex: 1;
+}
+
+.actioncol {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding-left: 10px;
+    width: 150px;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
 }

@@ -1,5 +1,4 @@
 <div>
-    <h1>Farm Table</h1>
     {% if table_data is defined and table_data %}
     <table>
         <thead>
@@ -7,6 +6,7 @@
                 {% for key in table_data[0].keys() %}
                     <th>{{ key }}</th>
                 {% endfor %}
+                    <th class="actioncol">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +15,10 @@
                     {% for value in row.values() %}
                         <td>{{ value if value is not none else 'NULL' }}</td>
                     {% endfor %}
+                        <td class="actioncol">
+                            <button onclick="updateRow(this)" style="padding: 5px 10px; margin: 2px;">Edit</button>
+                            <button onclick="deleteRow(this)" style="padding: 5px 10px; margin: 2px;">Delete</button>
+                        </td>
                 </tr>
             {% endfor %}
         </tbody>

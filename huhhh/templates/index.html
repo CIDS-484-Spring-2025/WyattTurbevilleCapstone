@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -10,26 +11,26 @@
             <div id="header" class="header">Dashboard</div>
             <div class="main">
                 <nav class="navbar">
-                    <a class="navlink" href="#" onclick="loadContent('dashboard'), changeHeader('Dashboard')">
+                    <a class="navlink" href="#" onclick="loadContent('dashboard'), changeHeader('Dashboard'), displayActions(0)">
                         <div class="navitem">Dashboard</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('farm'), changeHeader('Farm Table')">
+                    <a class="navlink" href="#" onclick="loadContent('farm'), changeHeader('Farm Table'), displayActions(1)">
                         <div class="navitem">Farm</div>
                     </a>
-                    <a class="navlink" href="#" onclick="">
+                    <a class="navlink" href="#" onclick="loadContent('cow'), changeHeader('Cow Table'), displayActions(1)">
                         <div class="navitem">Cow</div>
                     </a>
                     <a class="navlink" href="#" onclick="">
                         <div class="navitem">Study</div>
                     </a>
-                    <a class="navlink" href="#" onclick="">
+                    <a class="navlink" href="#" onclick="loadContent('sample'), changeHeader('Sample Table'), displayActions(1)">
                         <div class="navitem">Sample</div>
                     </a>
                 </nav>
                 <div class="content">
                     <div id="dynamic-actions" class="top-row">
                         <button class="actionbox">Search</button>
-                        <button class="actionbox" onclick="loadAction('add')">Add</button>
+                        <button class="actionbox" onclick="createRow()">Add</button>
                         <div id="dynamic-modal" class="modal">
                         </div>
                     </div>
@@ -41,28 +42,147 @@
         </section>
         <script>
             async function loadContent(page) {
-                // Prevent default anchor behavior
-                event.preventDefault();
-                
-                // Fetch Jinja-rendered content
+                if (event) {
+                    event.preventDefault();
+                }
                 const response = await fetch(`/load-content/${page}`);
                 const html = await response.text();
                 document.getElementById("dynamic-table").innerHTML = html;
             }
 
-            async function loadAction(action) {
+            function refreshContent() {
+                const table = getHeader();
+                loadContent(table);
+            }
+
+            async function createRow() {
                 const modal = document.getElementById("dynamic-modal");
                 const div = document.getElementById("header");
                 const table = div.textContent.trim().split(/\s+/)[0];
 
-                const response = await fetch(`/load-action/${table}/${action}`);
+                const response = await fetch(`/create-data/${table}`);
                 const html = await response.text();
                 modal.innerHTML = html;
                 modal.style.display = "block";
             }
 
+            function getHeader() {
+                const div = document.getElementById("header");
+                const table = div.textContent.trim().split(/\s+/)[0];
+                const tableLower = table.toLowerCase();
+                return tableLower;
+            }
+
             function changeHeader(text) {
                 document.getElementById('header').textContent = text;
+            }
+
+            function closeModal() {
+                const modal = document.getElementById("dynamic-modal");
+                modal.style.display = "none";
+            }
+
+            function displayActions(value) {
+                const buttons = document.getElementsByClassName('actionbox');
+  
+                if (value == 0) {
+                    for (let i = 0; i < buttons.length; i++) {
+                        buttons[i].style.display = 'none';
+                    }
+                }
+                if (value == 1) {
+                    for (let i = 0; i < buttons.length; i++) {
+                        buttons[i].style.display = 'inline-block';
+                    }
+                }
+            }
+
+            async function submitForm(action) {
+                const table = getHeader();
+                if (action == 'add') {
+                    try {
+                        const form = document.getElementById("addForm");
+                        const formData = new FormData(form); // Collects all form fields
+                        const response = await fetch(`/create-data/${table}`, { method: "POST", body: formData });
+                        if (response.ok) {
+                            refreshContent();
+                            closeModal();
+                        }
+                    } catch (error) {
+                        console.error("Create failed:", error);
+                        alert("Could not create item");
+                    }
+                }
+                if (action == 'update') {
+                    try {
+                        const form = document.getElementById("updateForm");
+                        const formData = new FormData(form);
+                        const response = await fetch(`/update-row/${table}`, { method: "POST", body: formData });
+                        if (response.ok) {
+                            refreshContent();
+                            closeModal();
+                        }
+                    } catch (error) {
+                        console.error("Update failed:", error);
+                        alert("Could not update item");
+                    }
+                }
+            }
+
+            async function deleteRow(callElement) {
+                const row_data = callElement.closest('tr').cells[0].textContent;
+                const modal = document.getElementById("dynamic-modal");
+
+                // Show confirmation modal
+                modal.innerHTML = `{% include 'deleteModal.html' %}`
+                modal.style.display = "block";
+
+                document.getElementById("confirm-delete").addEventListener("click", async () => {
+                    try {
+                        const table = getHeader();
+                        const response = await fetch(`/delete-data/${table}`, {
+                            method: "POST",
+                            body: row_data
+                        });
+                        if (response.ok) {
+                            refreshContent();  // Refresh the table/data
+                            modal.style.display = "none";  // Close modal
+                        } else {
+                            alert("Deletion failed. Server returned an error.");
+                        }
+                    } catch (error) {
+                        console.error("Delete error:", error);
+                        alert("Could not delete item. Check console for details.");
+                    }
+                });
+            }
+
+            async function updateRow(callElement) {
+                
+                const row = callElement.closest('tr');
+                const headers = Array.from(row.closest('table').querySelectorAll('th')).map(th => th.textContent.trim());
+                const row_data = {};
+
+                Array.from(row.cells).slice(0, -1).forEach((cell, index) => {
+                const header = headers[index];
+                row_data[header] = cell.textContent.trim();
+                });
+
+                const modal = document.getElementById("dynamic-modal");
+                const div = document.getElementById("header");
+                const table = div.textContent.trim().split(/\s+/)[0];
+                
+                const response = await fetch(`/update-data/${table}`, {
+                    method: 'POST',  // or 'GET' if needed
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(row_data),  // Send as JSON
+                });
+
+                const html = await response.text();
+                modal.innerHTML = html;
+                modal.style.display = "block";
             }
         </script>
     </body>

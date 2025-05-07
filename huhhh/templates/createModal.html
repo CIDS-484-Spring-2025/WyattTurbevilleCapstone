@@ -1,0 +1,70 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h2>Add Entry to Table</h2>
+    </div>
+    <div class="modal-body">
+        {% if not table_data %}
+            <p>Error: no table found</p>
+        {% else %}
+            <div class="form-container">
+                <form id="addForm" method="POST">
+                    {% for row in table_data %}
+                        {% if row.Type|lower|startswith('varchar(20)') %}
+                            <div class="form-group">
+                                <label for="{{ row.Field }}">{{ row.Field }}</label>
+                                <input type="text" id="{{ row.Field }}" name="{{ row.Field }}"
+                                minlength="0" maxlength="20"><br>
+                            </div>
+                        {% elif row.Type|lower|startswith('varchar(50)') %}
+                            <div class="form-group">
+                                <label for="{{ row.Field }}">{{ row.Field }}</label>
+                                <input type="text" id="{{ row.Field }}" name="{{ row.Field }}"
+                                minlength="0" maxlength="50"><br>
+                            </div>
+                        {% elif row.Type|lower|startswith('int') %}
+                            <div class="form-group">
+                                <label for="{{ row.Field }}">{{ row.Field }}</label>
+                                <input type="number" id="{{ row.Field }}" name="{{ row.Field }}"><br>
+                            </div>
+                        {% elif row.Type|lower|startswith('date') %}
+                            <div class="form-group">
+                                <label for="{{ row.Field }}">{{ row.Field }}</label>
+                                <input type="date" id="{{ row.Field }}" name="{{ row.Field }}" value="year-month-day"><br>
+                            </div>
+                        {% elif row.Type|lower|startswith('tiny') %} 
+                            <div class="form-group">
+                                {% if row.Field == 'Is_Frozen' %}
+                                    <label for="{{ row.Field }}">Is Frozen:</label>
+                                    <input type="checkbox" id="{{ row.Field }}" name="{{ row.Field }}" checked><br>
+                                {% else %}
+                                    {{ row.Field }}:<br>
+                                    <input type="radio" id="{{ row.Field }}Positive" name="{{ row.Field }}" value="1">
+                                    <label for="{{ row.Field }}Positive">Positive</label><br>
+                                    <input type="radio" id="{{ row.Field }}Negative" name="{{ row.Field }}" value="0">
+                                    <label for="{{ row.Field }}Negative">Negative</label><br>
+                                {% endif %}
+                            </div>
+                        {% elif row.Type|lower|startswith('enum') %}
+                            {% for column, choices in form_choices.items() %}
+                            <div class="form-group">
+                                <label for="{{ column }}">{{ column|title }}</label>
+                                <select class="form-control" id="{{ column }}" name="{{ column }}">
+                                    {% for value, label in choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Error: type not found</p>
+                        {% endif %}
+                    {% endfor %}
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="modal-footer">
+        <button onclick="closeModal()">Cancel</button>
+        <button onclick="submitForm('add')">Confirm</button>
+    </div>
+</div>
