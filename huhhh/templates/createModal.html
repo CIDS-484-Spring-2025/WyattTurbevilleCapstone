@@ -34,8 +34,9 @@
                         {% elif row.Type|lower|startswith('tiny') %} 
                             <div class="form-group">
                                 {% if row.Field == 'Is_Frozen' %}
-                                    <label for="{{ row.Field }}">Is Frozen:</label>
-                                    <input type="checkbox" id="{{ row.Field }}" name="{{ row.Field }}" checked><br>
+                                    <label for="{{ row.Field }}">Is Frozen</label>
+                                    <input type="hidden" name="{{ row.Field }}" value="0">
+                                    <input type="checkbox" id="{{ row.Field }}" name="{{ row.Field }}" value="1" checked><br>
                                 {% else %}
                                     {{ row.Field }}:<br>
                                     <input type="radio" id="{{ row.Field }}Positive" name="{{ row.Field }}" value="1">

@@ -38,7 +38,7 @@ def createData(table):
         table_module = importlib.import_module(f'database.queries.{table}')
         # Call the module's create_entry function
         table_module.create_entry(form_data)
-    except:
+    except Exception as e:
         return redirect('/failure')
     return redirect('/success')
 
@@ -71,9 +71,14 @@ def updateRow(table):
         form_data = request.form.to_dict()
         first_key = next(iter(form_data))
         row_id = form_data.pop(first_key)
+
+        if ('Is_Frozen' not in form_data):
+            form_data['Is_Frozen'] = '0'
+
         table_module = importlib.import_module(f'database.queries.{table}')
         table_module.update_entry(form_data, row_id)
-    except:
+    except Exception as e:
+        app.logger.error(f"Route error: {str(e)}", exc_info=True)
         return redirect('/failure')
     return redirect('/success')
 

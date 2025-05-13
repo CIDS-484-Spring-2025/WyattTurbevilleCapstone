@@ -39,7 +39,15 @@
                             <div class="form-group">
                                 {% if row.Field == 'Is_Frozen' %}
                                     <label for="{{ row.Field }}">Is Frozen:</label>
-                                    <input type="checkbox" id="{{ row.Field }}" name="{{ row.Field }}" checked><br>
+                                    {% if row_data[row.Field] == '1' %}
+                                    {# When originally checked #}
+                                        <input type="checkbox" name="{{ row.Field }}" value="1" checked>
+                                        <input type="hidden" name="{{ row.Field }}" value="0" disabled>
+                                    {% else %}
+                                    {# When originally unchecked #}
+                                        <input type="checkbox" name="{{ row.Field }}" value="1">
+                                        <input type="hidden" name="{{ row.Field }}" value="0">
+                                    {% endif %}
                                 {% else %}
                                     {{ row.Field }}:<br>
                                     {% set options = ['1', '0'] %}
