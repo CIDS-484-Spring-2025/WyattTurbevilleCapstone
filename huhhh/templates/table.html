@@ -6,6 +6,9 @@
                 {% for key in table_data[0].keys() %}
                     <th>{{ key }}</th>
                 {% endfor %}
+                {% if tag_data is defined and tag_data %}
+                    <th>StudyID</th>
+                {% endif %}
                     <th class="actioncol">Actions</th>
             </tr>
         </thead>
@@ -15,10 +18,18 @@
                     {% for value in row.values() %}
                         <td>{{ value if value is not none else 'NULL' }}</td>
                     {% endfor %}
-                        <td class="actioncol">
-                            <button onclick="updateRow(this)" style="padding: 5px 10px; margin: 2px;">Edit</button>
-                            <button onclick="deleteRow(this)" style="padding: 5px 10px; margin: 2px;">Delete</button>
+                    {% if tag_data is defined and tag_data %}
+                        <td>
+                            {% set row_sample_id = row['SampleID'] %}
+                            {% for tag in tag_data if tag.SampleID == row_sample_id %}
+                                <div class="studytag">{{ tag.StudyID }}</div>
+                            {% endfor %}
                         </td>
+                    {% endif %}
+                    <td class="actioncol">
+                        <button onclick="updateRow(this)" style="padding: 5px 10px; margin: 2px;">Edit</button>
+                        <button onclick="deleteRow(this)" style="padding: 5px 10px; margin: 2px;">Delete</button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

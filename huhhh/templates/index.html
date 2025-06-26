@@ -14,33 +14,65 @@
                     <a class="navlink" href="#" onclick="loadContent('dashboard'), changeHeader('Dashboard'), displayActions(0)">
                         <div class="navitem">Dashboard</div>
                     </a>
+                    <a class="navlink" href="#" onclick="loadContent('sample'), changeHeader('Sample Table'), displayActions(1)">
+                        <div class="navitem">Sample</div>
+                    </a>
+                    <a class="navlink" href="#" onclick="dropdown()">
+                        <div class="navitem">Tests</div>
+                    </a>
+                    <div id="dropdown" class="dropdown-content">
+                        <a class="navlink" href="#" onclick="loadContent('test'), changeHeader('Test Table'), displayActions(1)">
+                            <div class="navitem">Test</div>
+                        </a>
+                        <a class="navlink" href="#" onclick="loadContent('bap'), changeHeader('BAP Table'), displayActions(2)">
+                            <div class="navitem">BAP</div>
+                        </a>
+                        <a class="navlink" href="#" onclick="loadContent('mac'), changeHeader('MAC Table'), displayActions(2)">
+                            <div class="navitem">MAC</div>
+                        </a>
+                        <a class="navlink" href="#" onclick="loadContent('catalase'), changeHeader('Catalase Table'), displayActions(2)">
+                            <div class="navitem">Catalase</div>
+                        </a>
+                        <a class="navlink" href="#" onclick="loadContent('gramstain'), changeHeader('GramStain Table'), displayActions(2)">
+                            <div class="navitem">Gram Stain</div>
+                        </a>
+                    </div>
                     <a class="navlink" href="#" onclick="loadContent('farm'), changeHeader('Farm Table'), displayActions(1)">
                         <div class="navitem">Farm</div>
                     </a>
                     <a class="navlink" href="#" onclick="loadContent('cow'), changeHeader('Cow Table'), displayActions(1)">
                         <div class="navitem">Cow</div>
                     </a>
+                    <a class="navlink" href="#" onclick="loadContent('storage'), changeHeader('Storage Table'), displayActions(1)">
+                        <div class="navitem">Storage</div>
+                    </a>
                     <a class="navlink" href="#" onclick="loadContent('study'), changeHeader('Study Table'), displayActions(1)">
                         <div class="navitem">Study</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('sample'), changeHeader('Sample Table'), displayActions(1)">
-                        <div class="navitem">Sample</div>
-                    </a>
-                    <a class="navlink" href="#" onclick="loadContent('test'), changeHeader('Test Table'), displayActions(1)">
-                        <div class="navitem">Test</div>
-                    </a>
                 </nav>
-                <div class="content">
+                <section class="content">
                     <div id="dynamic-actions" class="top-row">
-                        <button class="actionbox">Search</button>
-                        <button class="actionbox" onclick="createRow()">Add</button>
+                        <div class="actionbox" style="flex-grow: 1;">
+                            <form id="table-form" method="GET" style="width: 100%;">
+                                <div class="table-input">
+                                    <input class="textbox" type="text" id="column-names" name="column-names" value="" style="height: 40px;">
+                                    <button class="buttonbox" type="button" onclick="search('table')">submit</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="actionbox">
+                            <button class="buttonbox">Export</button>
+                        </div>
+                        <div class="actionbox">
+                            <button class="buttonbox" onclick="createRow()">Add</button>
+                        </div>
                         <div id="dynamic-modal" class="modal">
                         </div>
                     </div>
                     <div id="dynamic-table" class="bottom-row">
                         {% include 'dashboard.html' %}
                     </div>
-                </div>
+                </section>
             </div>
         </section>
         <script>
@@ -80,6 +112,13 @@
                 document.getElementById('header').textContent = text;
             }
 
+            function dropdown() {
+                const div = document.getElementById("dropdown");
+                if (div.style.display === "flex") {
+                    div.style.display = "none";
+                } else {div.style.display = "flex";}
+            }
+
             function closeModal() {
                 const modal = document.getElementById("dynamic-modal");
                 modal.style.display = "none";
@@ -90,15 +129,24 @@
   
                 if (value == 0) {
                     for (let i = 0; i < buttons.length; i++) {
-                        buttons[i].style.display = 'none';
+                        buttons[i].style.display = '';
                     }
                 }
                 if (value == 1) {
                     for (let i = 0; i < buttons.length; i++) {
-                        buttons[i].style.display = 'inline-block';
+                        buttons[i].style.display = 'inline';
+                    }
+                }
+                if (value == 2) {
+                    for (let i = 0; i < (buttons.length); i++) {
+                        buttons[i].style.display = 'inline';
+                        if (i==2) buttons[i].style.display = '';
                     }
                 }
             }
+
+            let submissionCount = 0;
+            let firstFormData = null;
 
             async function submitForm(action) {
                 const table = getHeader();
@@ -106,7 +154,44 @@
                     try {
                         const form = document.getElementById("addForm");
                         const formData = new FormData(form); // Collects all form fields
-                        const response = await fetch(`/create-data/${table}`, { method: "POST", body: formData });
+                        let response
+
+                        if (table === "test") {
+                            submissionCount++;
+
+                            if (submissionCount === 1) {
+                                firstFormData = formData;
+                                const type = formData.get('testType');
+                                if (type === 'Prototheca') {
+                                    response = await fetch(`/create-data/test`, { method: "POST", body: firstFormData });
+                                    if (response.ok) {
+                                        submissionCount = 0;
+                                        firstFormData = null;
+                                        refreshContent();
+                                        closeModal();
+                                        return;
+                                    } else return;
+                                }
+                                response = await fetch(`/create-data/${type}`);
+                                const html = await response.text();
+                                const modal = document.getElementById("dynamic-modal");
+                                modal.innerHTML = html;
+
+                                return; // Exit without submitting
+                            } 
+                            else if (submissionCount === 2) {
+                                response = await fetch(`/create-data/test`, { method: "POST", body: firstFormData });
+                                if (response.ok) {
+                                    const type = firstFormData.get('testType').toLowerCase();
+                                    response = await fetch(`/create-data/${type}`, { method: "POST", body: formData });
+                                }
+                                // Reset for future submissions
+                                submissionCount = 0;
+                                firstFormData = null;
+                            }
+                        } else {
+                            response = await fetch(`/create-data/${table}`, { method: "POST", body: formData });
+                        }
                         if (response.ok) {
                             refreshContent();
                             closeModal();
@@ -145,7 +230,10 @@
                         const table = getHeader();
                         const response = await fetch(`/delete-data/${table}`, {
                             method: "POST",
-                            body: row_data
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ RowID: row_data })
                         });
                         if (response.ok) {
                             refreshContent();  // Refresh the table/data
@@ -176,7 +264,7 @@
                 const table = div.textContent.trim().split(/\s+/)[0];
                 
                 const response = await fetch(`/update-data/${table}`, {
-                    method: 'POST',  // or 'GET' if needed
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -186,6 +274,26 @@
                 const html = await response.text();
                 modal.innerHTML = html;
                 modal.style.display = "block";
+            }
+
+            async function search(action) {
+                if (action === 'table') {
+                    const table = getHeader();
+                    console.log("Table value:", table);  
+                    try {
+                        const form = document.getElementById("table-form");
+                        const formData = new FormData(form);
+                        const searchParams = new URLSearchParams(formData);
+                        const url = `/search-table/${table}?${searchParams.toString()}`;
+                        const response = await fetch(url);
+                        const html = await response.text();
+                        document.getElementById("dynamic-table").innerHTML = html;
+                    }
+                    catch (error) {
+                        console.error("Search error:", error);
+                        alert("Failed to find column. Check console for details.");
+                    }
+                }
             }
         </script>
     </body>

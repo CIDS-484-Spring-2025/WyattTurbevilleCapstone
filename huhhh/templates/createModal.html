@@ -1,6 +1,6 @@
 <div class="modal-content">
     <div class="modal-header">
-        <h2>Add Entry to Table</h2>
+        <h2>Add Entry to {{ table_name }} Table</h2>
     </div>
     <div class="modal-body">
         {% if not table_data %}
@@ -46,20 +46,41 @@
                                 {% endif %}
                             </div>
                         {% elif row.Type|lower|startswith('enum') %}
-                            {% for column, choices in form_choices.items() %}
                             <div class="form-group">
-                                <label for="{{ column }}">{{ column|title }}</label>
-                                <select class="form-control" id="{{ column }}" name="{{ column }}">
-                                    {% for value, label in choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
-                                    {% endfor %}
+                                <label for="{{ row.Field }}">{{ row.Field|title }}</label>
+                                <select class="form-control" id="{{ row.Field }}" name="{{ row.Field }}">
+                                    {% if form_choices and row.Field in form_choices %}
+                                        {% for value, label in form_choices[row.Field] %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    {% endif %}
                                 </select>
                             </div>
-                            {% endfor %}
                         {% else %}
                             <p>Error: type not found</p>
                         {% endif %}
                     {% endfor %}
+                    {% if table_name == 'Sample' and tag_data is defined and tag_data %}
+                        <div class="form-group">
+                            Select Studies:<br>
+                            {% for tag in tag_data %}
+                                <label for="{{ tag.StudyID }}">{{ tag.StudyID }}</label>
+                                <input type="checkbox" id="{{ tag.StudyID }}" name="StudyIDs[]" value="{{ tag.StudyID }}"><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if table_name == 'Test' %}
+                        <div class="form-group">
+                            <label for="SampleID">SampleID</label>
+                            <input type="number" id="SampleID" name="SampleID">
+                        </div>
+                    {% endif %}
+                    {% if table_name == 'Storage' %}
+                        <div class="form-group">
+                            <label for="TestID">TestID</label>
+                            <input type="number" id="TestID" name="TestID">
+                        </div>
+                    {% endif %}
                 </form>
             </div>
         {% endif %}

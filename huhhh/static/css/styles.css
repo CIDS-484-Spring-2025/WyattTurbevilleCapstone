@@ -55,20 +55,49 @@ a {
     margin: auto;
 }
 
+.dropdown-content {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+}
+
+.dropdown-content a {
+    display: flex;
+    height: 60px;
+    background: #e0e0e0;
+}
+
+.dropdown-content a:hover {
+    background: #f0f0f0;
+}
+
 .content {
     background: #d0d0d0;
     display: grid;
-    grid-template-rows: 1fr 8fr;
+    grid-template-rows: 1fr 12fr;
     min-height: 0; 
     gap: 16px;
-    padding: 16px 8px 0 16px;
+    padding: 16px 16px 0 16px;
 }
 
 .top-row {
     background: #e0e0e0;
     display: flex;
     gap: 16px;
+    padding: 0 16px 0 16px;
     justify-content: flex-end;
+    align-items: center;
+}
+
+.actionbox {
+    display: none;
+    height: 40px;
+}
+
+.table-input {
+    height: 40px;
+    display: flex;
+    gap: 16px;
     align-items: center;
 }
 
@@ -103,12 +132,16 @@ a {
     flex-wrap: wrap;
 }
 
-.actionbox {
+.buttonbox {
     border-radius: 10px;
     border: 1px solid gray;
     height: 40px;
     width: 100px;
-    display: none;
+}
+
+.textbox {
+    height: 40px;
+    width: 100%;
 }
 
 .bottom-row {
@@ -145,6 +178,13 @@ th:not(.actioncol), td:not(.actioncol) {
     white-space: nowrap;
     padding-left: 10px;
     width: 150px;
+}
+
+.studytag {
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 5px 10px; 
+    margin: 2px;
 }
 
 tr:nth-child(even) {
