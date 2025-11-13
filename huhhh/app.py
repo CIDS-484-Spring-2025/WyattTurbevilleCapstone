@@ -14,8 +14,8 @@ def home():
 
 @app.route('/load-content/<page>')
 def load_content(page):
-    if page == "dashboard":
-        return render_template("dashboard.html")
+    if page == "searchbar":
+        return render_template("searchbar.html")
     elif page == "sample":
         table_data = renderTable(page)
         tag_data = getStudySample()

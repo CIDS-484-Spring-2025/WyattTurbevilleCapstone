@@ -1,5 +1,10 @@
+html {
+    height: 100%;
+}
+
 body {
     margin: 0;
+    height: 100%;
 }
 
 a {
@@ -9,28 +14,13 @@ a {
 
 .root {
     width: 100%;
-    min-height: 100vh;
-    display: grid;
-    grid:
-      "header" 1fr
-      "main"10fr;
-    gap: 8px;
-}
-  
-.header { 
-    grid-area: header; 
-    text-align: center;
-    margin: auto;
-    font-size: 48px;
+    height: 100%;
 }
 
-.main { 
-  grid-area: main;
+.main {
   display: grid;
   grid-template-columns: 1fr 4fr; 
-  /*gap: 8px;*/
-  min-height: 0;
-  border-top: 1px solid lightgray;
+  height: 100%;
 }
 
 .navbar {
@@ -48,6 +38,19 @@ a {
 .navlink {
     display: flex;
     height: 60px;
+    background: #f0f0f0;
+}
+
+.drop-navlink {
+    display: flex;
+    height: 60px;
+    background: #f0f0f0;
+}
+
+.navlink.activeTab {
+    display: flex;
+    height: 60px;
+    background: #e0e0e0;
 }
 
 .navitem {
@@ -64,7 +67,7 @@ a {
 .dropdown-content a {
     display: flex;
     height: 60px;
-    background: #e0e0e0;
+    background: #d1d1d1;
 }
 
 .dropdown-content a:hover {
@@ -80,6 +83,14 @@ a {
     padding: 16px 16px 0 16px;
 }
 
+.contentSearch {
+    background: #d0d0d0;
+    display: grid;
+    min-height: 0; 
+    gap: 16px;
+    padding: 16px 16px 0 16px;
+} /* temp */
+
 .top-row {
     background: #e0e0e0;
     display: flex;
@@ -90,7 +101,7 @@ a {
 }
 
 .actionbox {
-    display: none;
+    display: inline;
     height: 40px;
 }
 
@@ -137,6 +148,11 @@ a {
     border: 1px solid gray;
     height: 40px;
     width: 100px;
+    display: inline;
+}
+
+.buttonbox.addrow {
+    display: none;
 }
 
 .textbox {

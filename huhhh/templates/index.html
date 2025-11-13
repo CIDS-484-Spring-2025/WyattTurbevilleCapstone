@@ -8,45 +8,46 @@
     </head>
     <body>
         <section class="root">
-            <div id="header" class="header">Dashboard</div>
             <div class="main">
                 <nav class="navbar">
-                    <a class="navlink" href="#" onclick="loadContent('dashboard'), changeHeader('Dashboard'), displayActions(0)">
-                        <div class="navitem">Dashboard</div>
+                    <a class="navlink activeTab" data-content="searchbar" data-action="2">
+                        <div class="navitem">Table Search</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('sample'), changeHeader('Sample Table'), displayActions(1)">
+                    <a class="navlink" data-content="sample" data-action="1">
                         <div class="navitem">Sample</div>
                     </a>
-                    <a class="navlink" href="#" onclick="dropdown()">
-                        <div class="navitem">Tests</div>
+                    <a class="drop-navlink">
+                        <details id="details" class="navitem">
+                            <summary class="navitem-summary">Test List</summary>
+                        </details>
                     </a>
                     <div id="dropdown" class="dropdown-content">
-                        <a class="navlink" href="#" onclick="loadContent('test'), changeHeader('Test Table'), displayActions(1)">
+                        <a class="navlink" data-content="test" data-action="1">
                             <div class="navitem">Test</div>
                         </a>
-                        <a class="navlink" href="#" onclick="loadContent('bap'), changeHeader('BAP Table'), displayActions(2)">
+                        <a class="navlink" data-content="bap" data-action="2">
                             <div class="navitem">BAP</div>
                         </a>
-                        <a class="navlink" href="#" onclick="loadContent('mac'), changeHeader('MAC Table'), displayActions(2)">
+                        <a class="navlink" data-content="mac" data-action="2">
                             <div class="navitem">MAC</div>
                         </a>
-                        <a class="navlink" href="#" onclick="loadContent('catalase'), changeHeader('Catalase Table'), displayActions(2)">
+                        <a class="navlink" data-content="catalase" data-action="2">
                             <div class="navitem">Catalase</div>
                         </a>
-                        <a class="navlink" href="#" onclick="loadContent('gramstain'), changeHeader('GramStain Table'), displayActions(2)">
+                        <a class="navlink" data-content="gramstain" data-action="2">
                             <div class="navitem">Gram Stain</div>
                         </a>
                     </div>
-                    <a class="navlink" href="#" onclick="loadContent('farm'), changeHeader('Farm Table'), displayActions(1)">
+                    <a class="navlink" data-content="farm" data-action="1">
                         <div class="navitem">Farm</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('cow'), changeHeader('Cow Table'), displayActions(1)">
+                    <a class="navlink" data-content="cow" data-action="1">
                         <div class="navitem">Cow</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('storage'), changeHeader('Storage Table'), displayActions(1)">
+                    <a class="navlink" data-content="storage" data-action="1">
                         <div class="navitem">Storage</div>
                     </a>
-                    <a class="navlink" href="#" onclick="loadContent('study'), changeHeader('Study Table'), displayActions(1)">
+                    <a class="navlink" data-content="study" data-action="1">
                         <div class="navitem">Study</div>
                     </a>
                 </nav>
@@ -56,44 +57,88 @@
                             <form id="table-form" method="GET" style="width: 100%;">
                                 <div class="table-input">
                                     <input class="textbox" type="text" id="column-names" name="column-names" value="" style="height: 40px;">
-                                    <button class="buttonbox" type="button" onclick="search('table')">submit</button>
+                                    <button class="buttonbox" id="search-button">Search</button>
                                 </div>
                             </form>
                         </div>
                         <div class="actionbox">
-                            <button class="buttonbox">Export</button>
+                            <button class="buttonbox" id="export-button">Export</button>
                         </div>
                         <div class="actionbox">
-                            <button class="buttonbox" onclick="createRow()">Add</button>
+                            <button class="buttonbox addrow" id="add-button">Add</button>
                         </div>
                         <div id="dynamic-modal" class="modal">
                         </div>
                     </div>
                     <div id="dynamic-table" class="bottom-row">
-                        {% include 'dashboard.html' %}
+                        {% include 'searchbar.html' %}
                     </div>
                 </section>
             </div>
         </section>
         <script>
-            async function loadContent(page) {
-                if (event) {
+            const navLinks = document.querySelectorAll('.navlink');
+            const dropNavlink = document.querySelector('.drop-navlink');
+            const actionButtons = document.querySelectorAll('.buttonbox');
+
+            let submissionCount = 0;
+            let firstFormData = null;
+            
+            navLinks.forEach (link => {
+                link.addEventListener('click', (event) => {
                     event.preventDefault();
-                }
+
+                    const action = parseInt(link.dataset.action);
+                    const content = link.dataset.content;
+
+                    activeTab(event);
+                    displayAction(action);
+                    loadContent(content);
+                });
+            });
+
+            dropNavlink.addEventListener('click', (e) => {
+                e.preventDefault();
+                //e.stopPropagation();
+                dropdown();
+            });
+
+            actionButtons[0].addEventListener('click', (e) => {
+                e.preventDefault();
+                search();
+            });
+
+            actionButtons[1].addEventListener('click', (e) => {
+                e.preventDefault();
+
+            });
+
+            actionButtons[2].addEventListener('click', (e) => {
+                e.preventDefault();
+                createRow();
+            });
+
+            async function loadContent(page) {
                 const response = await fetch(`/load-content/${page}`);
                 const html = await response.text();
                 document.getElementById("dynamic-table").innerHTML = html;
             }
 
             function refreshContent() {
-                const table = getHeader();
+                const table = getTable();
                 loadContent(table);
+            }
+
+            function activeTab(e) {
+                navLinks.forEach (tab => {
+                    tab.classList.remove('activeTab');
+                });
+                e.currentTarget.classList.add('activeTab');
             }
 
             async function createRow() {
                 const modal = document.getElementById("dynamic-modal");
-                const div = document.getElementById("header");
-                const table = div.textContent.trim().split(/\s+/)[0];
+                const table = getTable();
 
                 const response = await fetch(`/create-data/${table}`);
                 const html = await response.text();
@@ -101,22 +146,22 @@
                 modal.style.display = "block";
             }
 
-            function getHeader() {
-                const div = document.getElementById("header");
-                const table = div.textContent.trim().split(/\s+/)[0];
-                const tableLower = table.toLowerCase();
-                return tableLower;
-            }
-
-            function changeHeader(text) {
-                document.getElementById('header').textContent = text;
+            function getTable() {
+                const activeTable = document.querySelector('.activeTab');
+                return activeTable.dataset.content;
             }
 
             function dropdown() {
                 const div = document.getElementById("dropdown");
+                const details = document.getElementById('details');
+
                 if (div.style.display === "flex") {
                     div.style.display = "none";
                 } else {div.style.display = "flex";}
+
+                if (details.open) {
+                    details.open = false;
+                } else {details.open = true;}
             }
 
             function closeModal() {
@@ -124,32 +169,15 @@
                 modal.style.display = "none";
             }
 
-            function displayActions(value) {
-                const buttons = document.getElementsByClassName('actionbox');
-  
-                if (value == 0) {
-                    for (let i = 0; i < buttons.length; i++) {
-                        buttons[i].style.display = '';
-                    }
-                }
-                if (value == 1) {
-                    for (let i = 0; i < buttons.length; i++) {
-                        buttons[i].style.display = 'inline';
-                    }
-                }
-                if (value == 2) {
-                    for (let i = 0; i < (buttons.length); i++) {
-                        buttons[i].style.display = 'inline';
-                        if (i==2) buttons[i].style.display = '';
-                    }
-                }
+            function displayAction(value) {
+                const button = document.querySelector('#add-button');
+                if (value === 2) {
+                    button.classList.add('addrow');
+                } else button.classList.remove('addrow');
             }
 
-            let submissionCount = 0;
-            let firstFormData = null;
-
             async function submitForm(action) {
-                const table = getHeader();
+                const table = getTable();
                 if (action == 'add') {
                     try {
                         const form = document.getElementById("addForm");
@@ -227,7 +255,7 @@
 
                 document.getElementById("confirm-delete").addEventListener("click", async () => {
                     try {
-                        const table = getHeader();
+                        const table = getTable();
                         const response = await fetch(`/delete-data/${table}`, {
                             method: "POST",
                             headers: {
@@ -260,8 +288,7 @@
                 });
 
                 const modal = document.getElementById("dynamic-modal");
-                const div = document.getElementById("header");
-                const table = div.textContent.trim().split(/\s+/)[0];
+                const table = getTable();
                 
                 const response = await fetch(`/update-data/${table}`, {
                     method: 'POST',
@@ -276,23 +303,21 @@
                 modal.style.display = "block";
             }
 
-            async function search(action) {
-                if (action === 'table') {
-                    const table = getHeader();
-                    console.log("Table value:", table);  
-                    try {
-                        const form = document.getElementById("table-form");
-                        const formData = new FormData(form);
-                        const searchParams = new URLSearchParams(formData);
-                        const url = `/search-table/${table}?${searchParams.toString()}`;
-                        const response = await fetch(url);
-                        const html = await response.text();
-                        document.getElementById("dynamic-table").innerHTML = html;
-                    }
-                    catch (error) {
-                        console.error("Search error:", error);
-                        alert("Failed to find column. Check console for details.");
-                    }
+            async function search() {
+                const table = getTable();
+                console.log("Table value:", table);  
+                try {
+                    const form = document.getElementById("table-form");
+                    const formData = new FormData(form);
+                    const searchParams = new URLSearchParams(formData);
+                    const url = `/search-table/${table}?${searchParams.toString()}`;
+                    const response = await fetch(url);
+                    const html = await response.text();
+                    document.getElementById("dynamic-table").innerHTML = html;
+                }
+                catch (error) {
+                    console.error("Search error:", error);
+                    alert("Failed to find column. Check console for details.");
                 }
             }
         </script>
