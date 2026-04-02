@@ -1,17 +1,17 @@
 class EnumManager:
     def __init__(self):
         self._table_enums = {
-            'Test': {
-                'testType': ['BAP', 'MAC', 'Catalase', 'GramStain', 'Prototheca']
+            'test': {
+                'testType': ['BAP', 'MAC', 'GramStain', 'Prototheca']
             },
-            'Sample': {
+            'sample': {
                 'Quarter': ['LR', 'LF', 'RR', 'RF', 'C']
             },
-            'MAC': {
+            'mac': {
                 'Lactose': ['positive', 'negative', 'dry', 'wet', 'mucoid'],
                 'TSI': ['AA', 'AK', 'KK', 'KA', 'G', 'S']
             },
-            'BAP': {
+            'bap': {
                 'xhem': ['nhem', 'bhem', 'ahem'],
                 'size': ['tiny', 'small', 'medium', 'large']
             }

@@ -34,15 +34,17 @@
                         {% elif row.Type|lower|startswith('tiny') %} 
                             <div class="form-group">
                                 {% if row.Field == 'Is_Frozen' %}
-                                    <label for="{{ row.Field }}">Is Frozen</label>
+                                    <label for="{{ row.Field }}">Was Sample Frozen</label>
                                     <input type="hidden" name="{{ row.Field }}" value="0">
                                     <input type="checkbox" id="{{ row.Field }}" name="{{ row.Field }}" value="1" checked><br>
                                 {% else %}
-                                    {{ row.Field }}:<br>
+                                    Test Result:<br>
                                     <input type="radio" id="{{ row.Field }}Positive" name="{{ row.Field }}" value="1">
                                     <label for="{{ row.Field }}Positive">Positive</label><br>
                                     <input type="radio" id="{{ row.Field }}Negative" name="{{ row.Field }}" value="0">
                                     <label for="{{ row.Field }}Negative">Negative</label><br>
+                                    <input type="radio" id="{{ row.Field }}N/A" name="{{ row.Field }}" value="2">
+                                    <label for="{{ row.Field }}N/A">N/A</label><br>
                                 {% endif %}
                             </div>
                         {% elif row.Type|lower|startswith('enum') %}

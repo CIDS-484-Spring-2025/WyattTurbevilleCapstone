@@ -31,9 +31,6 @@
                         <a class="navlink" data-content="mac" data-action="2">
                             <div class="navitem">MAC</div>
                         </a>
-                        <a class="navlink" data-content="catalase" data-action="2">
-                            <div class="navitem">Catalase</div>
-                        </a>
                         <a class="navlink" data-content="gramstain" data-action="2">
                             <div class="navitem">Gram Stain</div>
                         </a>
@@ -80,6 +77,7 @@
             const navLinks = document.querySelectorAll('.navlink');
             const dropNavlink = document.querySelector('.drop-navlink');
             const actionButtons = document.querySelectorAll('.buttonbox');
+            const dynamicTable = document.querySelector('.bottom-row');
 
             let submissionCount = 0;
             let firstFormData = null;
@@ -116,6 +114,21 @@
             actionButtons[2].addEventListener('click', (e) => {
                 e.preventDefault();
                 createRow();
+            });
+
+            dynamicTable.addEventListener('click', (e) => {
+                const clickedButton = e.target.closest('.updateRow, .detailsRow, .deleteRow');
+
+                if (clickedButton) {
+
+                    if (clickedButton.classList.contains('updateRow')) {
+                        updateRow(clickedButton);
+                    } else if (clickedButton.classList.contains('deleteRow')) {
+                        deleteRow(clickedButton);
+                    } else if (clickedButton.classList.contains('detailsRow')) {
+                        //do nothing for now
+                    }
+                }
             });
 
             async function loadContent(page) {
@@ -190,6 +203,9 @@
                             if (submissionCount === 1) {
                                 firstFormData = formData;
                                 const type = formData.get('testType');
+                                const result = firstFormData.get('Is_Positive');
+                                const modal = document.getElementById("dynamic-modal");
+
                                 if (type === 'Prototheca') {
                                     response = await fetch(`/create-data/test`, { method: "POST", body: firstFormData });
                                     if (response.ok) {
@@ -200,9 +216,9 @@
                                         return;
                                     } else return;
                                 }
+
                                 response = await fetch(`/create-data/${type}`);
                                 const html = await response.text();
-                                const modal = document.getElementById("dynamic-modal");
                                 modal.innerHTML = html;
 
                                 return; // Exit without submitting

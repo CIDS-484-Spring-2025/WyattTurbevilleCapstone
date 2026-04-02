@@ -2,7 +2,7 @@ import importlib
 from flask import Flask, json, redirect, render_template, request, url_for
 from extension import EnumManager
 from database.query_util import (
-    renderModal, renderSearch, renderTable, getStudySample, getStudySampleList
+    renderModal, simpleSearch, renderTable, getStudySample, getStudySampleList
 )
 
 app = Flask(__name__)
@@ -130,7 +130,7 @@ def searchTable(table):
     search_terms = request.args.get('column-names', '')
     print(f"Handed Table: {table}")
     try:
-        search_data = renderSearch(table, search_terms)
+        search_data = simpleSearch(table, search_terms)
         return load_search(results=search_data, page=table)
     except Exception as e:
         return redirect('/failure')
